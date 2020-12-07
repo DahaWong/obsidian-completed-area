@@ -22,7 +22,7 @@ export default class FootlinksPlugin extends Plugin {
 		this.setting = new FootlinksSetting();
 		await this.loadSetting();
 		if (this.setting.showIcon) {
-			this.addRibbonIcon("footlinks-icon", "Footlinks", () => {
+			this.addRibbonIcon("Dice", "Footlinks", () => {
 				this.generateFootlinks();
 			});
 		}

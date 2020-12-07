@@ -1,8 +1,8 @@
 {
-  "id": "footlinks",
-  "name": "Footlinks",
-  "version": "0.1.7",
-  "description": "Extracts links from the main text to footer.",
+  "id": "completed-area",
+  "name": "Completed Area",
+  "version": "0.0.1",
+  "description": "Move completed to-do items to a seperate completed area.",
   "author": "Daha",
   "js": "main.js",
   "isDesktopOnly": false
