@@ -1,14 +1,14 @@
 import { App, PluginSettingTab, Setting, Notice } from "obsidian";
-import FootlinksPlugin from "./main";
+import CompletedAreaPlugin from "./main";
 
-export default class FootlinksSettingTab extends PluginSettingTab {
-	private readonly plugin: FootlinksPlugin;
+export default class CompletedAreaSettingTab extends PluginSettingTab {
+	private readonly plugin: CompletedAreaPlugin;
 	public seperatorSetting: Setting;
 	public iconSetting: Setting;
 	public refactorSetting: Setting;
 	public refactorIntervalSetting: Setting;
 
-	constructor(app: App, plugin: FootlinksPlugin) {
+	constructor(app: App, plugin: CompletedAreaPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

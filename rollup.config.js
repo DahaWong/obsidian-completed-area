@@ -5,7 +5,8 @@ import commonjs from "@rollup/plugin-commonjs";
 export default {
 	input: "./src/main.ts",
 	output: {
-		dir: "./build",
+		// dir: "./build",
+		dir: "/Users/dahawong/Documents/Note/丸记/.obsidian/plugins/completed-area",
 		sourcemap: "inline",
 		format: "cjs",
 		exports: "default",
