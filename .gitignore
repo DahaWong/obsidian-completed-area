@@ -1,0 +1,5 @@
+build/
+*.log
+yarn.lock
+node_modules/
+localPath.txt
