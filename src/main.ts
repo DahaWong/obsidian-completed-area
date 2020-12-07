@@ -25,6 +25,12 @@ export default class CompletedAreaPlugin extends Plugin {
 			});
 		}
 
+		this.registerEvent(
+			this.app.on("codemirror", (cm: CodeMirror.Editor) => {
+				cm.on("keydown", this.handleKeyDown);
+			})
+		);
+
 		this.addCommand({
 			id: "completed-area-shortcut",
 			name: "Extracted completed items.",
@@ -32,6 +38,25 @@ export default class CompletedAreaPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
+	}
+
+	handleKeyDown = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
+		if (event.keyCode === 88) {
+			// 'x' pressed
+			this.processCompletedItems();
+		}
+	};
+
+	async processCompletedItems() {
+		await this.loadSetting();
+		const activeLeaf = this.app.workspace.activeLeaf ?? null;
+		const source = activeLeaf.view.sourceMode;
+		const sourceContent = source.get();
+		const completedItems = this.extractCompletedItems(sourceContent) ?? null;
+		if (completedItems) {
+			const newContent = this.refactorContent(sourceContent, completedItems);
+			source.set(newContent, false);
+		}
 	}
 
 	async loadSetting() {
@@ -44,18 +69,6 @@ export default class CompletedAreaPlugin extends Plugin {
 			this.setting.showIcon = loadedSetting.showIcon;
 		} else {
 			this.saveData(this.setting);
-		}
-	}
-
-	async processCompletedItems() {
-		await this.loadSetting();
-		const activeLeaf = this.app.workspace.activeLeaf ?? null;
-		const source = activeLeaf.view.sourceMode;
-		const sourceContent = source.get();
-		const completedItems = this.extractCompletedItems(sourceContent) ?? null;
-		if (completedItems) {
-			const newContent = this.refactorContent(sourceContent, completedItems);
-			source.set(newContent, false);
 		}
 	}
 
