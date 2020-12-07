@@ -1,4 +1,4 @@
-// import CompletedAreaSettingTab from "./CompletedAreaSettingTab";
+import CompletedAreaSettingTab from "./CompletedAreaSettingTab";
 import CompletedAreaSetting from "./CompletedAreaSetting";
 import { Plugin, Notice, addIcon } from "obsidian";
 
@@ -14,8 +14,8 @@ export default class CompletedAreaPlugin extends Plugin {
 
 		this.completedAreaHeader =
 			"\n\n" +
-			"#".repeat(this.setting.completedAreaHierarchy) +
-			` ${this.setting.completedAreaName}\n`;
+			"#".repeat(Number(this.setting.completedAreaHierarchy)) +
+			` ${this.setting.completedAreaName}`;
 
 		this.completedHeaderRegx = new RegExp(this.completedAreaHeader);
 
@@ -31,7 +31,7 @@ export default class CompletedAreaPlugin extends Plugin {
 			callback: () => this.processCompletedItems(),
 		});
 
-		// this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
+		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
 	}
 
 	async loadSetting() {
@@ -47,7 +47,8 @@ export default class CompletedAreaPlugin extends Plugin {
 		}
 	}
 
-	processCompletedItems() {
+	async processCompletedItems() {
+		await this.loadSetting();
 		const activeLeaf = this.app.workspace.activeLeaf ?? null;
 		const source = activeLeaf.view.sourceMode;
 		const sourceContent = source.get();
