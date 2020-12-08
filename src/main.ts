@@ -1,35 +1,29 @@
 import CompletedAreaSettingTab from "./CompletedAreaSettingTab";
 import CompletedAreaSetting from "./CompletedAreaSetting";
-import { Plugin, Notice, addIcon } from "obsidian";
+import { Plugin, Notice } from "obsidian";
 
 export default class CompletedAreaPlugin extends Plugin {
 	public setting: CompletedAreaSetting;
 	public completedItemRegx: RegExp = /(\n?- \[x\] .*)/g;
-	public completedHeaderRegx: RegExp;
+	public keyPressed = {};
 	public completedAreaHeader: string;
 
 	async onload() {
 		this.setting = new CompletedAreaSetting();
 		await this.loadSetting();
 
-		this.completedAreaHeader =
-			"\n\n" +
-			"#".repeat(Number(this.setting.completedAreaHierarchy)) +
-			` ${this.setting.completedAreaName}`;
-
-		this.completedHeaderRegx = new RegExp(this.completedAreaHeader);
-
 		if (this.setting.showIcon) {
-			this.addRibbonIcon("dice", "Footlinks", () => {
+			this.addRibbonIcon("dice", "Completed Area", () => {
 				this.processCompletedItems();
 			});
 		}
 
-		this.registerEvent(
-			this.app.on("codemirror", (cm: CodeMirror.Editor) => {
-				cm.on("keydown", this.handleKeyDown);
-			})
-		);
+		// this.registerEvent(
+		// 	this.app.on("codemirror", (cm: CodeMirror.Editor) => {
+		// 		cm.on("keydown", this.handleKeyDown);
+		// 		cm.on("keyup", this.handleKeyUp);
+		// 	})
+		// );
 
 		this.addCommand({
 			id: "completed-area-shortcut",
@@ -40,15 +34,18 @@ export default class CompletedAreaPlugin extends Plugin {
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
 	}
 
-	handleKeyDown = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
-		if (event.keyCode === 88) {
-			// 'x' pressed
-			this.processCompletedItems();
-		}
-	};
+	// handleKeyDown = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
+	// 	this.keyPressed[event.key] = true;
+	// 	if (this.keyPressed["Meta"] && event.key == "t") {
+	// 		this.processCompletedItems();
+	// 	}
+	// };
+
+	// handleKeyUp = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
+	// 	delete this.keyPressed[event.key];
+	// };
 
 	async processCompletedItems() {
-		await this.loadSetting();
 		const activeLeaf = this.app.workspace.activeLeaf ?? null;
 		const source = activeLeaf.view.sourceMode;
 		const sourceContent = source.get();
@@ -91,12 +88,15 @@ export default class CompletedAreaPlugin extends Plugin {
 
 	refactorContent(content: string, items: Array<string>): string {
 		const completedArea = this.formatItems(items, content);
+		const header = this.completedAreaHeader.trimStart();
 		let newContent = content
 			.replace(this.completedItemRegx, "") // Remove completed items in main text
 			.trimStart()
 			.trimEnd();
-		newContent += completedArea;
-		return newContent;
+		console.table([newContent, header, completedArea]);
+		return this.isCompletedAreaExisted(content)
+			? newContent.replace(header, `${header}${completedArea}`)
+			: newContent + completedArea;
 	}
 
 	formatItems(items: Array<string>, content: string): string {
@@ -105,12 +105,21 @@ export default class CompletedAreaPlugin extends Plugin {
 		completedArea = items.reduce((prev, current) => {
 			return prev + current;
 		}, header);
-		return completedArea;
+		return (completedArea[0] === "\n" ? "" : "\n") + completedArea;
 	}
 
 	makeCompletedHeader(content: string): string {
-		return !!content.match(this.completedHeaderRegx)
-			? "\n" // if completed header already exists
+		this.completedAreaHeader =
+			"\n\n" +
+			"#".repeat(Number(this.setting.completedAreaHierarchy)) +
+			` ${this.setting.completedAreaName}`;
+
+		return this.isCompletedAreaExisted(content)
+			? "" // if completed header already exists
 			: this.completedAreaHeader;
+	}
+
+	isCompletedAreaExisted(content: string): boolean {
+		return !!content.match(RegExp(this.completedAreaHeader));
 	}
 }

@@ -3,6 +3,8 @@ import CompletedAreaPlugin from "./main";
 
 export default class CompletedAreaSettingTab extends PluginSettingTab {
 	private readonly plugin: CompletedAreaPlugin;
+	public defaultHeaderLevel = "2";
+	public defaultHeaderName = "Completed";
 
 	constructor(app: App, plugin: CompletedAreaPlugin) {
 		super(app, plugin);
@@ -14,30 +16,35 @@ export default class CompletedAreaSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName("Completed header level")
-			.setDesc("the completed items header")
+			.setName("Header level")
+			.setDesc("number of `#`s in the header.")
 			.addText((text) =>
 				text
-					.setPlaceholder("3")
+					.setPlaceholder(this.defaultHeaderLevel)
 					.setValue(this.plugin.setting.completedAreaHierarchy)
 					.onChange((value) => {
 						if (this.isHierarchyValid(value)) {
-							this.plugin.setting.completedAreaHierarchy = value;
-							this.plugin.saveData(this.plugin.setting);
-							text.setValue(value);
+							this.plugin.setting.completedAreaHierarchy =
+								value || this.defaultHeaderLevel;
+							this.plugin.saveData(this.plugin.setting).then(() => {
+								text.setValue(value);
+							});
+						} else {
+							new Notice("Header level's number not valid!");
 						}
 					})
 			);
 
 		new Setting(containerEl)
-			.setName("Completed Area Name")
-			.setDesc("where completed items be extracted to.")
+			.setName("Header name")
+			.setDesc("where the completed items be extracted to.")
 			.addText((text) =>
 				text
-					.setPlaceholder("Completed")
+					.setPlaceholder(this.defaultHeaderName)
 					.setValue(this.plugin.setting.completedAreaName)
 					.onChange((value) => {
-						this.plugin.setting.completedAreaName = value;
+						this.plugin.setting.completedAreaName =
+							value || this.defaultHeaderName;
 						this.plugin.saveData(this.plugin.setting);
 						text.setValue(value);
 					})
@@ -54,18 +61,12 @@ export default class CompletedAreaSettingTab extends PluginSettingTab {
 					);
 				});
 			});
-
-		// new Setting(containerEl)
-		// 	.setName("Choose a footlinks style")
-		// 	.addDropdown((dropdown) => {
-		// 		dropdown.addOption("Single brackets", "test display");
-		// 	});
 	}
 
 	isHierarchyValid(hierarchyLevel: string): boolean {
 		const validLevels = [1, 2, 3, 4, 5, 6];
 		for (let validNum of validLevels) {
-			if (Number(hierarchyLevel) === validNum) {
+			if (Number(hierarchyLevel) === validNum || hierarchyLevel === "") {
 				return true;
 			}
 		}

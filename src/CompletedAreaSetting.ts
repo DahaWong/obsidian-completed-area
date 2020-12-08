@@ -6,7 +6,7 @@ export default class FootLinksSetting {
 	public sortedBy: string;
 
 	constructor() {
-		this.completedAreaHierarchy = "3";
+		this.completedAreaHierarchy = "2";
 		this.completedAreaName = "Completed";
 		this.todoAreaName = "Todo";
 		this.showIcon = true;
