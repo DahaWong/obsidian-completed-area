@@ -5,7 +5,7 @@ import { Plugin, Notice } from "obsidian";
 export default class CompletedAreaPlugin extends Plugin {
 	public setting: CompletedAreaSetting;
 	public completedItemRegx: RegExp = /(\n?- \[x\] .*)/g;
-	public keyPressed = {};
+	public keyPressed: any = {};
 	public completedAreaHeader: string;
 
 	async onload() {
@@ -18,12 +18,12 @@ export default class CompletedAreaPlugin extends Plugin {
 			});
 		}
 
-		// this.registerEvent(
-		// 	this.app.on("codemirror", (cm: CodeMirror.Editor) => {
-		// 		cm.on("keydown", this.handleKeyDown);
-		// 		cm.on("keyup", this.handleKeyUp);
-		// 	})
-		// );
+		this.registerEvent(
+			this.app.on("codemirror", (cm: CodeMirror.Editor) => {
+				cm.on("keydown", this.handleKeyDown);
+				cm.on("keyup", this.handleKeyUp);
+			})
+		);
 
 		this.addCommand({
 			id: "completed-area-shortcut",
@@ -34,22 +34,35 @@ export default class CompletedAreaPlugin extends Plugin {
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
 	}
 
-	// handleKeyDown = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
-	// 	this.keyPressed[event.key] = true;
-	// 	if (this.keyPressed["Meta"] && event.key == "t") {
-	// 		this.processCompletedItems();
-	// 	}
-	// };
+	isHotkeyDown(): boolean {
+		const { first, second, third } = this.setting.hotkey;
+		return (
+			(first === "Empty" ? true : this.keyPressed[first]) &&
+			this.keyPressed[second] &&
+			this.keyPressed[third]
+		);
+	}
 
-	// handleKeyUp = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
-	// 	delete this.keyPressed[event.key];
-	// };
+	handleKeyDown = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
+		this.keyPressed[event.key] = true;
+		console.log(this.keyPressed);
+		if (this.isHotkeyDown()) {
+			setTimeout(() => {
+				this.processCompletedItems(true);
+			}, 10);
+		}
+	};
 
-	async processCompletedItems() {
+	handleKeyUp = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
+		this.keyPressed = {};
+	};
+
+	async processCompletedItems(triggeredByKey: boolean = false) {
 		const activeLeaf = this.app.workspace.activeLeaf ?? null;
 		const source = activeLeaf.view.sourceMode;
 		const sourceContent = source.get();
-		const completedItems = this.extractCompletedItems(sourceContent) ?? null;
+		const completedItems =
+			this.extractCompletedItems(sourceContent, triggeredByKey) ?? null;
 		if (completedItems) {
 			const newContent = this.refactorContent(sourceContent, completedItems);
 			source.set(newContent, false);
@@ -64,36 +77,40 @@ export default class CompletedAreaPlugin extends Plugin {
 			this.setting.completedAreaName = loadedSetting.completedAreaName;
 			this.setting.todoAreaName = loadedSetting.todoAreaName;
 			this.setting.showIcon = loadedSetting.showIcon;
+			this.setting.hotkey = loadedSetting.hotkey;
 		} else {
 			this.saveData(this.setting);
 		}
 	}
 
-	extractCompletedItems(text: string): Array<string> | void {
+	extractCompletedItems(
+		text: string,
+		triggeredByKey: boolean = false
+	): Array<string> | void {
 		let completedItems: Array<string> = [];
 
 		if (text) {
 			completedItems = text.match(this.completedItemRegx);
 
-			if (!completedItems) {
+			if (!completedItems && !triggeredByKey) {
 				new Notice("No completed todos found.");
 				return;
 			}
 
 			return completedItems;
-		} else {
+		} else if (!triggeredByKey) {
 			new Notice("This is an empty note.");
 		}
 	}
 
 	refactorContent(content: string, items: Array<string>): string {
 		const completedArea = this.formatItems(items, content);
+		console.log(completedArea);
 		const header = this.completedAreaHeader.trimStart();
 		let newContent = content
 			.replace(this.completedItemRegx, "") // Remove completed items in main text
 			.trimStart()
 			.trimEnd();
-		console.table([newContent, header, completedArea]);
 		return this.isCompletedAreaExisted(content)
 			? newContent.replace(header, `${header}${completedArea}`)
 			: newContent + completedArea;
@@ -102,15 +119,18 @@ export default class CompletedAreaPlugin extends Plugin {
 	formatItems(items: Array<string>, content: string): string {
 		let completedArea = "";
 		const header = this.makeCompletedHeader(content);
+		items[0] = (items[0][0] === "\n" ? "" : "\n") + items[0];
+
 		completedArea = items.reduce((prev, current) => {
 			return prev + current;
 		}, header);
-		return (completedArea[0] === "\n" ? "" : "\n") + completedArea;
+
+		return completedArea;
 	}
 
 	makeCompletedHeader(content: string): string {
 		this.completedAreaHeader =
-			"\n\n" +
+			"\n" +
 			"#".repeat(Number(this.setting.completedAreaHierarchy)) +
 			` ${this.setting.completedAreaName}`;
 
