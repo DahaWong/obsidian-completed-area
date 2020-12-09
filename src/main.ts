@@ -1,6 +1,11 @@
 import CompletedAreaSettingTab from "./CompletedAreaSettingTab";
 import CompletedAreaSetting from "./CompletedAreaSetting";
-import { Plugin, Notice } from "obsidian";
+import { Plugin, Notice, addIcon } from "obsidian";
+
+addIcon(
+	"completed-area",
+	'<g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect id="Rectangle" stroke="currentColor" stroke-width="8" x="20" y="20" width="60" height="60" rx="10"></rect><path d="M68.7153857,33.5033079 L72.0903697,35.8858648 C72.5415551,36.2043773 72.6491076,36.8283407 72.3305951,37.2795261 L72.2641586,37.3636708 L48.720426,64.1010398 C46.5305195,66.5880005 42.7391695,66.8288105 40.2522088,64.638904 C40.1258491,64.5276373 40.0042287,64.4111011 39.8876706,64.2896051 L28.6056533,52.5296259 C28.258873,52.1681543 28.2330404,51.6058741 28.5452158,51.2141283 L31.9837559,46.899139 C32.3279438,46.467221 32.9571019,46.3961018 33.3890199,46.7402897 C33.4274056,46.7708786 33.4634871,46.8042521 33.4969719,46.8401396 L42.8381754,56.8516325 C43.5917202,57.6592488 44.8572913,57.7030825 45.6649076,56.9495377 L45.7632746,56.8511374 L67.4072774,33.6382921 C67.7482521,33.2726022 68.3069198,33.2149531 68.7153857,33.5033079 Z" id="Path" fill="currentColor" fill-rule="nonzero"></path></g>'
+);
 
 export default class CompletedAreaPlugin extends Plugin {
 	public setting: CompletedAreaSetting;
@@ -13,7 +18,7 @@ export default class CompletedAreaPlugin extends Plugin {
 		await this.loadSetting();
 
 		if (this.setting.showIcon) {
-			this.addRibbonIcon("dice", "Completed Area", () => {
+			this.addRibbonIcon("completed-area", "Completed Area", () => {
 				this.processCompletedItems();
 			});
 		}
