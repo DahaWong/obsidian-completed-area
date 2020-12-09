@@ -1,6 +1,6 @@
 # Completed Area
 
-En(https://github.com/DahaWong/obsidian-completed/blob/main/README.md) | [简]
+[En](https://github.com/DahaWong/obsidian-completed/blob/main/README.md) | 简
 
 ⚠️ *此插件目前的版本可能存在缺陷，更多功能尚在开发中。*
 
