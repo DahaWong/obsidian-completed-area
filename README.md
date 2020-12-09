@@ -7,6 +7,7 @@ En | [简](https://github.com/DahaWong/obsidian-completed/blob/main/README_zh.md
 ![Demo](https://raw.githubusercontent.com/DahaWong/obsidian-completed-area/main/demo.png)
 ## Use
 - Click the icon on left sidebar, then the **completed to-do items** will be moved to completed area.
+- Or set your custom hotkey(see `Preference#set-shortcut` part), default is `Control + Enter`.
 
 ## Preference
 
