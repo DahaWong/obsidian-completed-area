@@ -7,7 +7,7 @@ En(https://github.com/DahaWong/obsidian-completed/blob/main/README.md) | [简]
 ![Demo](https://raw.githubusercontent.com/DahaWong/obsidian-completed-area/main/demo.png)
 
 ## 使用
-- Click the icon on left sidebar, then the **completed to-do items** will be moved to completed area.
+点击主页左侧边栏图标，即可将已完成的清单项目移动至一块另设的区域。
 
 ## 设置
 
