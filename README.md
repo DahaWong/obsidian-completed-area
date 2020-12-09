@@ -2,7 +2,7 @@
 
 En | [简](https://github.com/DahaWong/obsidian-completed/blob/main/README_zh.md)
 
-⚠️ *This is an alpha version, it may contain bugs, and more features are developing.*
+⚠️ *This plugin may contain bugs, and more features are developing.*
 
 ![Demo](https://raw.githubusercontent.com/DahaWong/obsidian-completed-area/main/demo.png)
 ## Use
