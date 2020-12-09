@@ -22,4 +22,4 @@ Default is `Completed`.
 You can turn sidebar icon off and use command instead, if you don't like sidebar icons.
 
 ### Set shortcut
-This shortcut/ **should be** the same as the official `toggle to-do items` shortcut, for the sake of removing completed items at once.
+This shortcut **should be** the same as the official `toggle to-do items` shortcut, for the sake of removing completed items at once.
