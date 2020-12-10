@@ -18,7 +18,7 @@ export default class CompletedAreaPlugin extends Plugin {
 
 		if (this.setting.showIcon) {
 			this.addRibbonIcon("completed-area", "Completed Area", () => {
-				this.processCompletedItems();
+				this.editSource();
 			});
 		}
 
@@ -26,25 +26,12 @@ export default class CompletedAreaPlugin extends Plugin {
 			id: "completed-area-shortcut",
 			name: "Extracted completed items.",
 			hotkeys: [{ modifiers: ["Ctrl"], key: "Enter" }],
-			callback: () => this.processCompletedItems(),
+			callback: () => {
+				this.editSource();
+			},
 		});
 
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
-	}
-
-	async processCompletedItems() {
-		const activeLeaf = this.app.workspace.activeLeaf ?? null;
-		if (activeLeaf) {
-			const source = activeLeaf.view.sourceMode;
-			const sourceContent = source.get();
-			const completedItems = this.extractCompletedItems(sourceContent) ?? null;
-			if (completedItems) {
-				const newContent = this.refactorContent(sourceContent, completedItems);
-				source.set(newContent, false);
-			}
-		} else {
-			new Notice("Please active a leaf first.");
-		}
 	}
 
 	async loadSetting() {
@@ -58,6 +45,28 @@ export default class CompletedAreaPlugin extends Plugin {
 		} else {
 			this.saveData(this.setting);
 		}
+	}
+
+	editSource() {
+		const activeLeaf = this.app.workspace.activeLeaf ?? null;
+		if (activeLeaf) {
+			const source = activeLeaf.view.sourceMode;
+			const sourceText = source.get();
+
+			const todoRegx = /-\s\[[\sx]\]\s/gi;
+			const toggledText = this.toggleElement(todoRegx, this.replaceTodo);
+			const completedItems = this.extractCompletedItems(toggledText) ?? null;
+			if (completedItems) {
+				const newText = this.refactorContent(toggledText, completedItems);
+				source.set(newText, false);
+			}
+		} else {
+			new Notice("Please active a leaf first.");
+		}
+	}
+
+	replaceTodo(startWith: string) {
+		return startWith === "- [ ] " ? "- [x] " : "- [ ] ";
 	}
 
 	extractCompletedItems(text: string): Array<string> | void {
@@ -113,5 +122,60 @@ export default class CompletedAreaPlugin extends Plugin {
 
 	isCompletedAreaExisted(content: string): boolean {
 		return !!content.match(RegExp(this.completedAreaHeader));
+	}
+
+	toggleElement(re: RegExp, subst: any): string {
+		var activeLeaf: any = this.app.workspace.activeLeaf;
+		var editor = activeLeaf.view.sourceMode.cmEditor;
+		var selection = editor.somethingSelected();
+		var selectedText = this.getSelectedText(editor);
+
+		var newString = selectedText.content.replace(re, subst);
+		editor.replaceRange(newString, selectedText.start, selectedText.end);
+
+		// Keep cursor in the same place
+		if (selection) {
+			editor.setSelection(selectedText.start, {
+				line: selectedText.end.line,
+				ch: editor.getLine(selectedText.end.line).length,
+			});
+		}
+
+		return activeLeaf.view.sourceMode.get();
+	}
+
+	getSelectedText(editor: any) {
+		if (editor.somethingSelected()) {
+			// Toggle to-dos under the selection
+			let cursorStart = editor.getCursor(true);
+			let cursorEnd = editor.getCursor(false);
+			let content = editor.getRange(
+				{ line: cursorStart.line, ch: 0 },
+				{ line: cursorEnd.line, ch: editor.getLine(cursorEnd.line).length }
+			);
+
+			return {
+				start: { line: cursorStart.line, ch: 0 },
+				end: {
+					line: cursorEnd.line,
+					ch: editor.getLine(cursorEnd.line).length,
+				},
+				content: content,
+			};
+		} else {
+			// Toggle the todo in the line
+			var lineNr = editor.getCursor().line;
+			var contents = editor.getDoc().getLine(lineNr);
+			let cursorStart = {
+				line: lineNr,
+				ch: 0,
+			};
+			let cursorEnd = {
+				line: lineNr,
+				ch: contents.length,
+			};
+			let content = editor.getRange(cursorStart, cursorEnd);
+			return { start: cursorStart, end: cursorEnd, content: content };
+		}
 	}
 }
