@@ -12,6 +12,5 @@ export default class CompletedAreaSetting {
 		this.todoAreaName = "Todo";
 		this.showIcon = true;
 		this.sortedBy = "Asc";
-		this.hotkey = { first: "Empty", second: "Control", third: "Enter" };
 	}
 }

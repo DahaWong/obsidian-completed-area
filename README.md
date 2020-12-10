@@ -6,8 +6,9 @@ En | [简](https://github.com/DahaWong/obsidian-completed/blob/main/README_zh.md
 
 ![Demo](https://raw.githubusercontent.com/DahaWong/obsidian-completed-area/main/demo.png)
 ## Use
-- Click the icon on left sidebar, then the **completed to-do items** will be moved to completed area.
-- Or set your custom hotkey(see `Preference#set-shortcut` part), default is `Control + Enter`.
+- Click the icon on left sidebar, or
+- Use shortcut: `Control + Enter` *(default)*
+then the **completed to-do items** will be moved to completed area.
 
 ## Preference
 
@@ -20,6 +21,3 @@ Default is `Completed`.
 
 ### Show icon or not
 You can turn sidebar icon off and use command instead, if you don't like sidebar icons.
-
-### Set shortcut
-This shortcut **should be** the same as the official `toggle to-do items` shortcut, for the sake of removing completed items at once.

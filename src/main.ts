@@ -10,7 +10,6 @@ addIcon(
 export default class CompletedAreaPlugin extends Plugin {
 	public setting: CompletedAreaSetting;
 	public completedItemRegx: RegExp = /(\n?- \[x\] .*)/g;
-	public keyPressed: any = {};
 	public completedAreaHeader: string;
 
 	async onload() {
@@ -23,54 +22,28 @@ export default class CompletedAreaPlugin extends Plugin {
 			});
 		}
 
-		this.registerEvent(
-			this.app.on("codemirror", (cm: CodeMirror.Editor) => {
-				cm.on("keydown", this.handleKeyDown);
-				cm.on("keyup", this.handleKeyUp);
-			})
-		);
-
 		this.addCommand({
 			id: "completed-area-shortcut",
 			name: "Extracted completed items.",
+			hotkeys: [{ modifiers: ["Ctrl"], key: "Enter" }],
 			callback: () => this.processCompletedItems(),
 		});
 
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
 	}
 
-	isHotkeyDown(): boolean {
-		const { first, second, third } = this.setting.hotkey;
-		return (
-			(first === "Empty" ? true : this.keyPressed[first]) &&
-			this.keyPressed[second] &&
-			this.keyPressed[third]
-		);
-	}
-
-	handleKeyDown = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
-		this.keyPressed[event.key] = true;
-		console.log(this.keyPressed);
-		if (this.isHotkeyDown()) {
-			setTimeout(() => {
-				this.processCompletedItems(true);
-			}, 10);
-		}
-	};
-
-	handleKeyUp = (cm: CodeMirror.Editor, event: KeyboardEvent): void => {
-		this.keyPressed = {};
-	};
-
-	async processCompletedItems(triggeredByKey: boolean = false) {
+	async processCompletedItems() {
 		const activeLeaf = this.app.workspace.activeLeaf ?? null;
-		const source = activeLeaf.view.sourceMode;
-		const sourceContent = source.get();
-		const completedItems =
-			this.extractCompletedItems(sourceContent, triggeredByKey) ?? null;
-		if (completedItems) {
-			const newContent = this.refactorContent(sourceContent, completedItems);
-			source.set(newContent, false);
+		if (activeLeaf) {
+			const source = activeLeaf.view.sourceMode;
+			const sourceContent = source.get();
+			const completedItems = this.extractCompletedItems(sourceContent) ?? null;
+			if (completedItems) {
+				const newContent = this.refactorContent(sourceContent, completedItems);
+				source.set(newContent, false);
+			}
+		} else {
+			new Notice("Please active a leaf first.");
 		}
 	}
 
@@ -82,29 +55,23 @@ export default class CompletedAreaPlugin extends Plugin {
 			this.setting.completedAreaName = loadedSetting.completedAreaName;
 			this.setting.todoAreaName = loadedSetting.todoAreaName;
 			this.setting.showIcon = loadedSetting.showIcon;
-			this.setting.hotkey = loadedSetting.hotkey;
 		} else {
 			this.saveData(this.setting);
 		}
 	}
 
-	extractCompletedItems(
-		text: string,
-		triggeredByKey: boolean = false
-	): Array<string> | void {
+	extractCompletedItems(text: string): Array<string> | void {
 		let completedItems: Array<string> = [];
 
 		if (text) {
 			completedItems = text.match(this.completedItemRegx);
 
-			if (!completedItems && !triggeredByKey) {
+			if (!completedItems) {
 				new Notice("No completed todos found.");
 				return;
 			}
 
 			return completedItems;
-		} else if (!triggeredByKey) {
-			new Notice("This is an empty note.");
 		}
 	}
 
