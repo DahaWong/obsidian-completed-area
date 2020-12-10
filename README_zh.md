@@ -7,10 +7,9 @@
 ![Demo](https://raw.githubusercontent.com/DahaWong/obsidian-completed-area/main/demo.png)
 
 ## 使用
+这个插件可以切换待办条目的状态，与此同时把已完成的条目移动到一个独立的区域。可以通过：
 - 点击主页左侧边栏图标，或者
 - 使用快捷键 `Control + Enter` *（默认）*
-
-即可将已完成的清单项目移动至一块另设的区域。
 
 ## 设置
 
