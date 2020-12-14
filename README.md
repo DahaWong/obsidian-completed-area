@@ -25,3 +25,5 @@ You can turn sidebar icon off and use command instead, if you don't like sidebar
 
 ## Credits
 1. [Hotkey++ Plugin](https://github.com/argenos/hotkeysplus-obsidian)
+
+*☕️ To express your thankfulness: [Buy Me a Coffee](https://buymeacoffee.com/daha)*
