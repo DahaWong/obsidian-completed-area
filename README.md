@@ -28,4 +28,4 @@ You can turn sidebar icon off and use command instead, if you don't like sidebar
 
 ---
 
-*☕️ To express your thankfulness: [Buy Me a Coffee](https://buymeacoffee.com/daha)*
+<p align=center>☕️ To express your thankfulness: <a href="https://buymeacoffee.com/daha">Buy Me a Coffee</a></p>
