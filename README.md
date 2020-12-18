@@ -29,7 +29,5 @@ You can turn sidebar icon off and use command instead, if you don't like sidebar
 ---
 
 <p align=center>
-  ☕️ To express your thankfulness:
-  
-  <a href="https://buymeacoffee.com/daha" align=center>Buy Me a Coffee</a>
+  ☕️ To express your thankfulness:<a href="https://buymeacoffee.com/daha">Buy Me a Coffee</a>
 </p>
